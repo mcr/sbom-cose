@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+require 'openssl'
+require 'chariwt'
+require 'ecdsa'
+
+pubkeyfile="signingkey.crt"
+sbomfile  ="sbom_signed.bin"
+puts "using verification key key at: #{pubkeyfile}"
+pubkey = OpenSSL::X509::Certificate.new(File.open(pubkeyfile))
+
+puts "reading sbom from #{sbomfile}"
+signed = Chariwt::CoseSign1.create(File.read(sbomfile))
+signed.parse
+
+unless signed.parsed
+  puts "Could not parse COSE structure of SBOM file"
+  exit 1
+end
+
+validated = signed.validate(pubkey)
+unless validated
+  puts "Signature did not match"
+  exit 2
+end
+
+puts "SBOM read and validated"
+exit 0
+

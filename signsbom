@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+require 'openssl'
+require 'chariwt'
+require 'ecdsa'
+
+privkeyfile="signingkey.pem"
+puts "opening existing key at: #{privkeyfile}"
+privkey = OpenSSL::PKey.read(File.open(privkeyfile))
+
+puts "signing SBOM at: 'sbom.dat'"
+sbomdat = File.read("sbom.dat")
+
+# CoseSign0 (and countersignatures) not implemented yet.
+signed = Chariwt::CoseSign1.new
+
+signed.content = sbomdat
+
+# set algorithm to ECDSA.
+signed.protected_bucket[1] = -7
+# XXX kid should be set to what?
+
+temporary_key   = nil  # signer will generate, RFC6979 would be better
+(privkey,group) = ECDSA::Format::PrivateKey.decode(privkey)
+signed.generate_signature(group, privkey, temporary_key)
+
+File.open("sbom_signed.bin", "wb") do |f| f.write signed.binary; end
+puts "Wrote signed object to 'sbom_signed.bin'"
+puts "Use _ cbor2pretty.rb sbom_signed.bin _ to view"
+
