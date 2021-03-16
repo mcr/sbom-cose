@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+
+require 'openssl';
+
+privkeyfile="signingkey.pem"
+pubkeyfile ="signingkey.crt"
+curve='prime256v1'
+dn='CN=manufacturer.example'
+duration=(2*365*60*60)        # 2 years
+
+if File.exists?(pubkeyfile)
+  puts "Already created certificate in #{pubkeyfile}"
+  exit 1
+end
+
+privkey = if File.exists?(privkeyfile)
+            puts "using existing key at: #{privkeyfile}"
+            OpenSSL::PKey.read(File.open(privkeyfile))
+          else
+            # the new key
+            key = OpenSSL::PKey::EC.new(curve)
+            key.generate_key
+            File.open(privkeyfile, "w", 0600) do |f| f.write key.to_pem end
+            key
+          end
+
+dnobj = OpenSSL::X509::Name.parse dn
+ncert = OpenSSL::X509::Certificate.new
+ncert.version = 2
+ncert.serial  = 123456778  # should be random number in a CA
+ncert.subject = dnobj
+ncert.issuer  = dnobj
+ncert.public_key = privkey   # openssl pulls public key out
+ncert.not_before = Time.now
+ncert.not_after  = ncert.not_before + duration
+
+# what extensions are relevant?
+ncert.sign(privkey, OpenSSL::Digest::SHA256.new)
+
+File.open(pubkeyfile, "w", 0644) do |f| f.write ncert.to_pem; end
+
+

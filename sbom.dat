@@ -1,0 +1,21 @@
+SPDXVersion: SPDX-2.2
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: Software Assurance Guardian Point Man (SAG-PM)
+DocumentNamespace: dns:softwareassuranceguardian.com
+Creator: Organization: dns:reliableenergyanalytics.com
+Creator: Tool: PyInstaller 3.6
+Created: 2020-09-08T19:44:17Z
+
+
+PackageName:aiodns
+SPDXID: SPDXRef-aiodns-2.0.0
+PackageSupplier: Person:Saúl Ibarra Corretgé
+PackageVersion: 2.0.0
+PackageChecksum: SHA256: aaa5ac584f40fe778013df0aa6544bf157799bd3f608364b451840ed2c8688de
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseDeclared: NOASSERTION
+PackageLicenseConcluded: NOASSERTION
+PackageCopyrightText: NOASSERTION
+
